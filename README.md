@@ -1,56 +1,32 @@
 # Joshua Angulo González
 
-**Software Engineer — Backend, Full-Stack y Datos** · Culiacán, Sinaloa, México
+Machine learning engineer and data scientist in Culiacán, Mexico (UTC-7).
 
-Convierto necesidades operativas en productos digitales de punta a punta: APIs REST, plataformas multi-tenant, sistemas distribuidos en tiempo real y pipelines de datos a gran escala. Integro seguridad, validación y observabilidad desde el diseño, no como un añadido al final.
+Most of my work sits between data and production: collecting real-time data, training models on it, and writing the code that runs those models live. I also build LLM products, mainly agents and RAG.
 
-## Stack
+## What I'm working on
 
-- **Lenguajes** · TypeScript · JavaScript · Python · SQL · Rust
-- **Backend** · Node.js · Express · APIs REST · OAuth 2.0 y JWT · SSE y WebSockets · colas de trabajo · sistemas distribuidos
-- **Datos** · PostgreSQL · Supabase · MongoDB · Redis · DuckDB · Polars · Parquet
-- **Frontend** · React · Next.js · Vite · Tailwind CSS
-- **Infraestructura** · Docker · Linux · AWS · GitHub Actions · CI/CD
-- **Calidad y observabilidad** · Vitest · Playwright · OpenTelemetry · Sentry · Prometheus
-- **IA y ML** · agentes LLM · tool calling · RAG y embeddings · XGBoost · CatBoost · scikit-learn
+**Quantitative research on crypto-market data** (2026 to present). A recorder on AWS EC2 has captured 38.8M live market events, stored as Parquet on S3. I train XGBoost, LightGBM and CatBoost models on that data with walk-forward, purged validation and tune them with Optuna. Models reach a Rust engine in stages: shadow mode first, then a small canary, with drift monitoring and a test that checks Python and Rust produce the same scores.
 
-## En qué trabajo
+**LuckAgents** (2024 to present). A multi-tenant SaaS where AI agents answer a business's customers on WhatsApp, book appointments and take payments. I built it alone: agents with tool calling, RAG on pgvector, 20 background workers, idempotent payments with Stripe and Mercado Pago, and 1,066 automated tests. Meta approved it as a WhatsApp Tech Provider. Before launch I audited the code myself and fixed an account-takeover risk and 31 access-control gaps.
 
-Los dos proyectos que sostienen mi experiencia están en repositorios privados: uno es producto propio en desarrollo y el otro contiene estrategia propia. La arquitectura y las decisiones de ambos sí están escritas y son públicas:
+Both codebases are private. Two things you can read today:
 
-**→ [case-studies](https://github.com/joshua-angulo/case-studies)** — notas de ingeniería sanitizadas: qué se construyó, qué decisiones lo sostienen y qué haría distinto.
+- [case-studies](https://github.com/joshua-angulo/case-studies): how each system is built, the decisions behind it and what I would change.
+- [multi-tenant-rls](https://github.com/joshua-angulo/multi-tenant-rls): a small, runnable version of the tenant-isolation pattern from LuckAgents, with 16 tests, most of them negative.
 
-**→ [multi-tenant-rls](https://github.com/joshua-angulo/multi-tenant-rls)** — código ejecutable: aislamiento entre clientes con Row Level Security en PostgreSQL, con 16 pruebas en su mayoría negativas y verificación por mutación.
+## Tools
 
-### LuckAgents — plataforma SaaS multi-tenant de agentes de IA · 2025 – presente
+Python, SQL, pandas, Polars, DuckDB · scikit-learn, XGBoost, LightGBM, CatBoost, PyTorch, Optuna · AWS (EC2, S3), Docker, GitHub Actions · TypeScript, Node.js, React, Rust · LLM agents, RAG, pgvector
 
-Monorepo de 10 workspaces: API en Express, dashboard React/Vite, portal Next.js y un runtime de agentes en contenedores, sobre PostgreSQL/Supabase, MongoDB y Redis.
+I use Claude Code, Codex and Cursor every day. I plan the work, review every change they make and test it.
 
-- Aislamiento de datos por cliente con SSO/OAuth 2.0, RBAC y 31 políticas RLS.
-- 1,066 pruebas automatizadas: 619 de API, 371 unitarias y de UI, 76 E2E.
-- CI/CD en GitHub Actions con CodeQL y revisión de dependencias; una auditoría de modernización llevó de 155 a 0 las vulnerabilidades conocidas en dependencias de producción.
-- Integraciones con Stripe, WhatsApp Business API, Google Calendar y AWS S3 mediante webhooks idempotentes, instrumentadas con OpenTelemetry, Sentry y Prometheus.
+## Contact
 
-### Plataforma cuantitativa para mercados electrónicos · 2026 – presente
+I'm looking for a long-term role in machine learning, data science or AI engineering, remote on US hours or on-site in Mexico.
 
-Runtime asíncrono en Rust (Tokio) que consume WebSockets en tiempo real, reconstruye libros de órdenes y usa aritmética decimal en los cálculos monetarios.
-
-- Pipeline de investigación en Python con Parquet, Polars y DuckDB sobre decenas de millones de registros de series temporales; modelos tabulares con XGBoost, CatBoost y LightGBM.
-- Disciplina de auditoría: validación walk-forward, control de fuga temporal, manifiestos SHA-256, pruebas negativas de integridad y paridad de resultados entre Python y Rust.
-
-## Formación
-
-- **Ingeniería Industrial, titulado** — Universidad Tecmilenio, Campus Culiacán · 2021 – 2025
-- **Materias de posgrado en Ciencias de la Computación** — Universidad Autónoma de Sinaloa
-- Español nativo · **inglés C1**
-
-## Contacto
-
-Abierto a posiciones de backend o full-stack, en México o remoto.
-
-- [linkedin.com/in/joshuaangulogonzalez](https://www.linkedin.com/in/joshuaangulogonzalez/)
-- [joshuaangulo10@gmail.com](mailto:joshuaangulo10@gmail.com)
+joshuaangulo10@gmail.com · [LinkedIn](https://www.linkedin.com/in/joshuaangulogonzalez/)
 
 ---
 
-**In English.** I'm a software engineer working across backend, full-stack and data. I build products end to end — REST APIs, multi-tenant platforms, real-time distributed systems and high-volume data pipelines in TypeScript/Node.js, Python and Rust — with security, automated testing and observability designed in from the start. Most of my work lives in private repositories; I'm glad to walk through the architecture and the code in an interview.
+Soy ingeniero de machine learning y científico de datos en Culiacán, Sinaloa. Trabajo con datos en tiempo real, con los modelos que se entrenan sobre ellos y con los sistemas que los llevan a producción. También construyo productos con LLM. Busco un puesto de largo plazo, remoto o presencial.
