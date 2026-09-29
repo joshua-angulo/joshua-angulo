@@ -12,7 +12,7 @@ Software engineer in Culiacán, Mexico (UTC-7). TypeScript, Python and Rust. I'v
 
 ## Public code
 
-[pg-tenant-rls](https://github.com/joshua-angulo/pg-tenant-rls): the tenant isolation from LuckAgents cut down to about 200 lines of SQL and TypeScript, with 16 tests, most of which try to read or write another tenant's data. Runs in two minutes with Docker.
+[pg-tenant-rls](https://github.com/joshua-angulo/pg-tenant-rls): the tenant isolation from LuckAgents cut down to about 300 lines of SQL and TypeScript, with 16 tests, most of which try to read or write another tenant's data. Runs in two minutes with Docker.
 
 ## Contact
 
