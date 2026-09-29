@@ -1,10 +1,10 @@
 # LuckAgents
 
-A SaaS that puts an AI assistant on a small business's WhatsApp number. The assistant answers customers, books appointments and takes payments. I've been building it alone since 2024. It is tested and Meta-approved, and it has not launched to paying customers yet. The code is private; this is how it's put together and what I got wrong.
+An AI assistant that lives on a small business's WhatsApp number. It answers customers, books appointments and can charge them. I built it alone between 2024 and July 2026, got it through Meta's review as a WhatsApp Tech Provider, ran my own audit on it, and then shelved it. It never had paying customers. The code is private; this note is how it's put together and what the audit found.
 
 ## Shape
 
-A pnpm and Turborepo monorepo with 10 workspaces: a Next.js portal, a React/Vite dashboard, an Express API with 42 route modules, and an agent runtime that runs in containers. PostgreSQL on Supabase holds tenant data (row-level security, pgvector for RAG), MongoDB holds conversations, Redis holds queues, locks and the SSE fan-out. 20 BullMQ workers handle messaging, billing and AI jobs. Deploys go to Vercel and Railway with Docker. OpenTelemetry, Sentry and Prometheus were wired in from the first feature, not bolted on at the end.
+A pnpm and Turborepo monorepo with 10 workspaces. A Next.js portal, a React/Vite dashboard, an Express API, and an agent runtime that runs in containers. Postgres on Supabase holds tenant data, with row-level security and pgvector for RAG. MongoDB holds conversations. Redis holds the queues, the locks and the SSE fan-out, and 20 BullMQ workers pull messaging, billing and AI jobs from it. Deploys went to Vercel and Railway with Docker. OpenTelemetry and Sentry were wired in with the first feature.
 
 ```mermaid
 flowchart LR
@@ -18,27 +18,31 @@ flowchart LR
   RD --> RT["Agent runtime (containers)"] --> LLM["OpenRouter / OpenAI"]
 ```
 
-## Decisions
+## Decisions I'd make again
 
-**Tenant isolation is in the database.** Filtering by `tenantId` in every controller means every query is a chance to leak. The boundary is 31 RLS policies in Postgres that require an active membership. Pulled out as a runnable repo: [pg-tenant-rls](https://github.com/joshua-angulo/pg-tenant-rls).
+**Isolation lives in the database.** Filtering by `tenantId` in every controller means every query is a chance to leak. The boundary is 31 RLS policies in Postgres that require an active membership. The runnable version is [pg-tenant-rls](https://github.com/joshua-angulo/pg-tenant-rls).
 
-**Every external effect happens once.** Stripe, Mercado Pago and WhatsApp all redeliver webhooks. Each effect runs under an idempotency key, cross-instance sections take a Redis lock, and a webhook is signature-checked and saved as a receipt before the API answers. Payments are reconciled against each provider afterwards. When the system isn't sure, it skips: not doing something is easier to fix than doing it twice.
+**Every external effect happens once.** Stripe, Mercado Pago and WhatsApp all redeliver webhooks. Each effect runs under an idempotency key, cross-instance sections take a Redis lock, and a webhook gets its signature checked and saved as a receipt before the API answers. Payments are reconciled against each provider afterwards. When the system isn't sure, it skips. Not doing something is easier to fix than doing it twice.
 
-**Agents can act, and can give up.** They call tools to book and charge, answer from the business's own documents through RAG, and transcribe voice notes. When the model fails or the request is out of scope, the conversation goes to a person. Each tenant's AI budget is reserved before every paid call so one customer can't run up everyone's bill.
+**Agents can act, and they can give up.** They call tools to book and charge, answer from the business's own documents through RAG, and transcribe voice notes. When the model fails or the request is out of scope, a person gets the conversation. Each tenant's AI budget is reserved before every paid call so one customer can't run up everyone's bill.
 
-**SSE, not WebSockets, for streaming replies.** Replies only flow one way. SSE reconnects on its own, passes corporate proxies and carries the same traces as the rest of the API.
+**Streaming goes over SSE.** Replies only flow one way. SSE reconnects on its own, gets through corporate proxies and carries the same traces as the rest of the API.
 
-**Secrets never touch git.** External secrets manager, templates without values in the repo, and a pre-commit scan that blocks anything it can't verify.
+**No secrets in git.** External secrets manager, templates without values in the repo, and a pre-commit scan that blocks anything it can't verify.
 
-## The pre-launch audit (July 2026)
+## The audit (July 2026)
 
-Before launching I went through the whole monorepo as if I were reviewing someone else's. What it found:
+Before what was going to be the launch I went through the whole monorepo as if it were someone else's code.
 
-- Members in `suspended` and `invited` state could still read tenant data. Every endpoint was correct; the policies never checked status. All 31 were rewritten, and every permission change now ships with a negative test.
-- A legacy OAuth flow next to SSO trusted the identity the client sent. That was an account-takeover path. Removed.
-- 155 vulnerable dependency paths (4 critical). Now 0 known advisories, with CodeQL and dependency review in CI.
+- Members in `suspended` or `invited` state could still read tenant data. Every endpoint was right; the policies never checked status. I rewrote all 31, and every permission change now ships with a negative test.
+- A legacy OAuth flow next to SSO trusted the identity the client sent. That's an account takeover. Removed.
+- 155 vulnerable dependency paths, 4 of them critical. Now 0, with CodeQL and dependency review in CI.
 
-At the end, 1,066 tests pass in CI: API, dashboard unit and UI, and Playwright end-to-end in Chromium and Firefox. I still haven't launched. Two external checks (connectivity to the managed database cluster and to Redis on the hosting provider) and a recovery path that has actually been exercised come before real customers. A green CI run by itself doesn't get a system that charges money to production.
+1,066 tests pass in CI: API, dashboard unit and UI, and Playwright e2e in Chromium and Firefox.
+
+## Where it stands
+
+After the audit I decided not to launch it, and I stopped working on it in July 2026. The tests still pass, and the RLS setup is public as [pg-tenant-rls](https://github.com/joshua-angulo/pg-tenant-rls).
 
 ## What I'd do differently
 
