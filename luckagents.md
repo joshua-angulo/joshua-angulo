@@ -1,6 +1,6 @@
 # LuckAgents
 
-An AI assistant that lives on a small business's WhatsApp number. It answers customers, books appointments and can charge them. I built it alone between 2024 and July 2026, got it through Meta's review as a WhatsApp Tech Provider, ran my own audit on it, and then shelved it. It never had paying customers. The code is private; this note is how it's put together and what the audit found.
+An AI assistant that lives on a small business's WhatsApp number. It answers customers, books appointments and can charge them. I built it alone between 2024 and 2026, got it through Meta's review as a WhatsApp Tech Provider and ran my own security audit on it. The code is private; this note is how it's put together and what the audit found.
 
 ## Shape
 
@@ -32,7 +32,7 @@ flowchart LR
 
 ## The audit (July 2026)
 
-Before what was going to be the launch I went through the whole monorepo as if it were someone else's code.
+In July 2026 I went through the whole monorepo as if it were someone else's code.
 
 - Members in `suspended` or `invited` state could still read tenant data. Every endpoint was right; the policies never checked status. I rewrote all 31, and every permission change now ships with a negative test.
 - A legacy OAuth flow next to SSO trusted the identity the client sent. That's an account takeover. Removed.
@@ -40,12 +40,7 @@ Before what was going to be the launch I went through the whole monorepo as if i
 
 1,066 tests pass in CI: API, dashboard unit and UI, and Playwright e2e in Chromium and Firefox.
 
-## Where it stands
-
-After the audit I decided not to launch it, and I stopped working on it in July 2026. The tests still pass, and the RLS setup is public as [pg-tenant-rls](https://github.com/joshua-angulo/pg-tenant-rls).
-
 ## What I'd do differently
 
 - Write the RLS policies before the endpoints, each with a query that should fail and does.
 - Treat environment variables as a checked contract from day one, before three apps drift apart.
-- Decide what "ready to launch" means at the start, external checks included, instead of under pressure at the end.
