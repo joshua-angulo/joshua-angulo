@@ -22,7 +22,7 @@ flowchart LR
 
 **Isolation lives in the database.** Filtering by `tenantId` in every controller means every query is a chance to leak. The boundary is 31 RLS policies in Postgres that require an active membership. The runnable version is [pg-tenant-rls](https://github.com/joshua-angulo/pg-tenant-rls).
 
-**Every external effect happens once.** Stripe, Mercado Pago and WhatsApp all redeliver webhooks. Each effect runs under an idempotency key, cross-instance sections take a Redis lock, and a webhook gets its signature checked and saved as a receipt before the API answers. When the system isn't sure, it skips. Not doing something is easier to fix than doing it twice.
+**Every external effect happens once.** Stripe, Mercado Pago and WhatsApp all redeliver webhooks. Each effect runs under an idempotency key, cross-instance sections take a Redis lock, and a webhook gets its signature checked and saved as a receipt before the API answers. Background jobs reconcile payments against Stripe, Mercado Pago and Shopify. When the system isn't sure, it skips. Not doing something is easier to fix than doing it twice.
 
 **Agents can act, and they can give up.** They call tools to book and charge, answer from the business's own documents through RAG, and transcribe voice notes. When the model fails or the request is out of scope, a person gets the conversation. Each tenant's AI budget is reserved before every paid call so one tenant can't run up everyone's bill.
 
