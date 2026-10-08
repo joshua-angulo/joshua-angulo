@@ -4,7 +4,7 @@ An AI assistant that lives on a small business's WhatsApp number. It answers cus
 
 ## Shape
 
-A pnpm and Turborepo monorepo with 10 workspaces. A Next.js portal, a React/Vite dashboard, an Express API, and an agent runtime that runs in containers. Postgres on Supabase holds tenant data, with row-level security and pgvector for RAG. MongoDB holds conversations. Redis holds the queues, the locks and the SSE fan-out, and 20 BullMQ workers pull messaging, billing and AI jobs from it. Deploys went to Vercel and Railway with Docker. OpenTelemetry and Sentry were wired in with the first feature.
+A pnpm and Turborepo monorepo with 10 workspaces. A Next.js portal, a React/Vite dashboard, an Express API, and an agent runtime that runs in containers. Postgres on Supabase holds tenant data, with row-level security and pgvector for RAG. MongoDB holds conversations. Redis holds the queues, the locks and the SSE fan-out, and BullMQ workers pull messaging, billing and AI jobs from it. Deploys went to Vercel and Railway with Docker. OpenTelemetry and Sentry were wired in with the first feature.
 
 ```mermaid
 flowchart LR
@@ -20,7 +20,7 @@ flowchart LR
 
 ## Decisions I'd make again
 
-**Isolation lives in the database.** Filtering by `tenantId` in every controller means every query is a chance to leak. The boundary is 31 RLS policies in Postgres that require an active membership. The runnable version is [pg-tenant-rls](https://github.com/joshua-angulo/pg-tenant-rls).
+**Isolation lives in the database.** Filtering by `tenantId` in every controller means every query is a chance to leak. The boundary is a set of RLS policies in Postgres that require an active membership. The runnable version is [pg-tenant-rls](https://github.com/joshua-angulo/pg-tenant-rls).
 
 **Every external effect happens once.** Stripe, Mercado Pago and WhatsApp all redeliver webhooks. Each effect runs under an idempotency key, cross-instance sections take a Redis lock, and a webhook gets its signature checked and saved as a receipt before the API answers. Background jobs reconcile payments against Stripe, Mercado Pago and Shopify. When the system isn't sure, it skips. Not doing something is easier to fix than doing it twice.
 
@@ -34,7 +34,7 @@ flowchart LR
 
 I went through the whole monorepo as if it were someone else's code.
 
-- Members in `suspended` or `invited` state could still read tenant data. Every endpoint was right; the policies never checked status. I rewrote all 31, and every permission change now ships with a negative test.
+- Members in `suspended` or `invited` state could still read tenant data. Every endpoint was right; the policies never checked status. I rewrote them all, and every permission change now ships with a negative test.
 - A legacy OAuth flow next to SSO trusted the identity the client sent. That's an account takeover. Removed.
 - 155 vulnerable dependency paths, 4 of them critical. Now 0, with CodeQL and dependency review in CI.
 
