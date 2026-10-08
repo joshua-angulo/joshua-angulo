@@ -6,7 +6,7 @@ Culiacán, Mexico (UTC-7). TypeScript and Python for most things, Rust when it h
 
 **Market data platform** (2026, ongoing). A recorder on EC2 and S3 for live market data, gradient-boosting and PyTorch models validated walk-forward on that data, and an async Rust engine that scores them on live feeds. Also private; [notes](https://github.com/joshua-angulo/joshua-angulo/blob/main/market-data-platform.md).
 
-**City of Lynwood, California** (2024 to 2025, contract). A chat and phone assistant for residents in Python, FastAPI, Twilio and GPT, with handoff to staff.
+**City of Lynwood, California** (2024, contract). A chat and phone assistant for residents in Python, FastAPI, Twilio and GPT, with handoff to staff.
 
 Public: [pg-tenant-rls](https://github.com/joshua-angulo/pg-tenant-rls). The tenant isolation from LuckAgents cut down to about 300 lines of SQL and TypeScript and 16 tests, most of which try to read another tenant's rows. `docker compose up`, `npm test`, two minutes.
 
